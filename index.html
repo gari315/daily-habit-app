@@ -569,11 +569,11 @@
         <div class="stat-label">定期テストまで</div>
         <div class="stat-value" id="testCountdown">--</div>
       </div>
-      <div class="stat-item">
+      <div class="stat-item" style="cursor: pointer;" id="taskCountItem">
         <div class="stat-label">タスク名</div>
         <div class="stat-value" id="taskCount">0</div>
       </div>
-      <div class="stat-item">
+      <div class="stat-item" style="cursor: pointer;" id="actionCountItem">
         <div class="stat-label">今すぐ行動</div>
         <div class="stat-value" id="actionCount">0</div>
       </div>
@@ -623,6 +623,21 @@
       <div class="modal-buttons">
         <button class="btn btn-success" id="saveTaskBtn">保存</button>
         <button class="btn btn-danger" id="cancelTaskBtn">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数値編集モーダル -->
+  <div id="countModal" class="modal">
+    <div class="modal-content">
+      <h3 id="countModalTitle">残りタスク数を編集</h3>
+      <div class="form-group">
+        <label for="countInput">残り数</label>
+        <input type="number" id="countInput" min="0" placeholder="0">
+      </div>
+      <div class="modal-buttons">
+        <button class="btn btn-success" id="saveCountBtn">保存</button>
+        <button class="btn btn-danger" id="cancelCountBtn">キャンセル</button>
       </div>
     </div>
   </div>
@@ -724,6 +739,9 @@
     let testDate = null;
     let submissions = [];
     let quizzes = [];
+    let completedTasks = 0;
+    let completedActions = 0;
+    let editingCountType = null;
 
     // DOM要素
     const currentTaskDiv = document.getElementById("currentTask");
@@ -735,8 +753,11 @@
     const taskModal = document.getElementById("taskModal");
     const habitModal = document.getElementById("habitModal");
     const testModal = document.getElementById("testModal");
+    const countModal = document.getElementById("countModal");
     const modalTitle = document.getElementById("modalTitle");
     const taskInput = document.getElementById("taskInput");
+    const countInput = document.getElementById("countInput");
+    const countModalTitle = document.getElementById("countModalTitle");
 
     // イベントリスナー
     document.getElementById("drawTaskBtn").addEventListener("click", function() {
@@ -767,6 +788,17 @@
     document.getElementById("saveTestDateBtn").addEventListener("click", saveTestDate);
     document.getElementById("addSubmissionBtn").addEventListener("click", addSubmission);
     document.getElementById("addQuizBtn").addEventListener("click", addQuiz);
+    
+    document.getElementById("taskCountItem").addEventListener("click", function() {
+      openCountModal('task');
+    });
+    
+    document.getElementById("actionCountItem").addEventListener("click", function() {
+      openCountModal('action');
+    });
+    
+    document.getElementById("saveCountBtn").addEventListener("click", saveCount);
+    document.getElementById("cancelCountBtn").addEventListener("click", closeCountModal);
 
     // 初期化
     function init() {
@@ -797,7 +829,9 @@
         habitCompletions: habitCompletions,
         testDate: testDate,
         submissions: submissions,
-        quizzes: quizzes
+        quizzes: quizzes,
+        completedTasks: completedTasks,
+        completedActions: completedActions
       };
       localStorage.setItem("taskManagerData", JSON.stringify(data));
       console.log("データ保存完了", data);
@@ -813,6 +847,8 @@
         testDate = data.testDate || null;
         submissions = data.submissions || [];
         quizzes = data.quizzes || [];
+        completedTasks = data.completedTasks || 0;
+        completedActions = data.completedActions || 0;
       } else {
         tasks = [
           { text: "国語", pending: 0 },
@@ -839,8 +875,8 @@
     }
 
     function updateStats() {
-      taskCountEl.textContent = tasks.length;
-      actionCountEl.textContent = actions.length;
+      taskCountEl.textContent = tasks.length + completedTasks;
+      actionCountEl.textContent = actions.length + completedActions;
     }
 
     function updateTestCountdown() {
@@ -1013,8 +1049,10 @@
       
       if (currentType === 'task') {
         tasks = tasks.filter(t => t !== currentItem);
+        completedTasks++;
       } else {
         actions = actions.filter(a => a !== currentItem);
+        completedActions++;
       }
       
       currentItem = null;
@@ -1023,6 +1061,63 @@
       
       saveData();
       renderLists();
+    }
+
+    function openCountModal(type) {
+      editingCountType = type;
+      if (type === 'task') {
+        countModalTitle.textContent = "タスク名の数を編集";
+        countInput.value = tasks.length + completedTasks;
+      } else {
+        countModalTitle.textContent = "今すぐ行動の数を編集";
+        countInput.value = actions.length + completedActions;
+      }
+      countModal.classList.add("active");
+      countInput.focus();
+      countInput.select();
+    }
+
+    function closeCountModal() {
+      countModal.classList.remove("active");
+      editingCountType = null;
+    }
+
+    function saveCount() {
+      const newCount = parseInt(countInput.value) || 0;
+      
+      if (editingCountType === 'task') {
+        const currentTotal = tasks.length + completedTasks;
+        const diff = newCount - currentTotal;
+        
+        if (diff > 0) {
+          completedTasks += diff;
+        } else if (diff < 0) {
+          const toReduce = Math.abs(diff);
+          if (completedTasks >= toReduce) {
+            completedTasks -= toReduce;
+          } else {
+            completedTasks = 0;
+          }
+        }
+      } else {
+        const currentTotal = actions.length + completedActions;
+        const diff = newCount - currentTotal;
+        
+        if (diff > 0) {
+          completedActions += diff;
+        } else if (diff < 0) {
+          const toReduce = Math.abs(diff);
+          if (completedActions >= toReduce) {
+            completedActions -= toReduce;
+          } else {
+            completedActions = 0;
+          }
+        }
+      }
+      
+      saveData();
+      updateStats();
+      closeCountModal();
     }
 
     function skipItem() {
@@ -1353,6 +1448,18 @@
     testModal.addEventListener("click", function(e) {
       if (e.target === testModal) {
         closeTestModal();
+      }
+    });
+
+    countModal.addEventListener("click", function(e) {
+      if (e.target === countModal) {
+        closeCountModal();
+      }
+    });
+
+    countInput.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        saveCount();
       }
     });
 
