@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -16,6 +15,7 @@
       --warning: #ffd600;
       --danger: #ff5252;
       --border: #333;
+      --info: #00b8d4;
     }
 
     * {
@@ -57,10 +57,15 @@
       letter-spacing: 2px;
     }
 
-    .habit-btn {
-      position: absolute;
-      top: 0;
-      right: 0;
+    .header-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .header-btn {
       background: var(--success);
       color: white;
       border: none;
@@ -72,7 +77,11 @@
       transition: all 0.2s ease;
     }
 
-    .habit-btn:hover {
+    .header-btn.test-btn {
+      background: var(--info);
+    }
+
+    .header-btn:hover {
       filter: brightness(1.2);
       transform: scale(1.05);
     }
@@ -101,6 +110,14 @@
       font-size: 1.5rem;
       font-weight: bold;
       color: var(--accent);
+    }
+
+    .stat-item.test-countdown {
+      border-color: var(--info);
+    }
+
+    .stat-item.test-countdown .stat-value {
+      color: var(--info);
     }
 
     .task-display {
@@ -132,6 +149,12 @@
       gap: 12px;
     }
 
+    .draw-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
     .action-buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -153,6 +176,11 @@
 
     .btn-primary {
       background-color: var(--accent);
+      color: white;
+    }
+
+    .btn-secondary {
+      background-color: var(--info);
       color: white;
     }
 
@@ -266,6 +294,7 @@
     .task-buttons {
       display: flex;
       gap: 4px;
+      flex-shrink: 0;
     }
 
     .scroll-list li button {
@@ -348,6 +377,10 @@
       border-radius: 6px;
       color: var(--text-main);
       font-size: 1rem;
+    }
+
+    .form-group input[type="date"] {
+      color-scheme: dark;
     }
 
     .modal-buttons {
@@ -433,18 +466,62 @@
       transition: width 0.3s ease;
     }
 
+    .test-item {
+      background: var(--bg-color);
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .test-item-info {
+      flex-grow: 1;
+    }
+
+    .test-item-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .test-item-date {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .test-item button {
+      background: var(--danger);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .section-divider {
+      margin: 25px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
     @media (max-width: 600px) {
       .container {
         padding: 15px;
       }
-
+      
       header h1 {
         font-size: 1.5rem;
       }
 
-      .habit-btn {
-        position: static;
-        margin-top: 10px;
+      .header-buttons {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .header-btn {
         width: 100%;
       }
 
@@ -455,6 +532,10 @@
       }
 
       .lists-container {
+        grid-template-columns: 1fr;
+      }
+
+      .draw-buttons {
         grid-template-columns: 1fr;
       }
 
@@ -472,30 +553,39 @@
     }
   </style>
 </head>
-
 <body>
   <div class="container">
     <header>
       <h1>ランダムタスク</h1>
       <p class="subtitle">一つのことに集中する</p>
-      <button class="habit-btn" id="habitBtn">📅 今日の習慣</button>
+      <div class="header-buttons">
+        <button class="header-btn" id="habitBtn">📅 今日の習慣</button>
+        <button class="header-btn test-btn" id="testBtn">📝 テスト管理</button>
+      </div>
     </header>
 
     <div class="stats">
-      <div class="stat-item">
-        <div class="stat-label">残りタスク</div>
-        <div class="stat-value" id="remainingCount">0</div>
+      <div class="stat-item test-countdown">
+        <div class="stat-label">定期テストまで</div>
+        <div class="stat-value" id="testCountdown">--</div>
       </div>
       <div class="stat-item">
-        <div class="stat-label">完了タスク</div>
-        <div class="stat-value" id="completedCount">0</div>
+        <div class="stat-label">タスク名</div>
+        <div class="stat-value" id="taskCount">0</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">今すぐ行動</div>
+        <div class="stat-value" id="actionCount">0</div>
       </div>
     </div>
 
     <section class="task-display">
       <div id="currentTask" class="card">準備はいいですか?</div>
       <div class="main-buttons">
-        <button id="drawBtn" class="btn btn-primary">タスクを引く</button>
+        <div class="draw-buttons">
+          <button id="drawTaskBtn" class="btn btn-primary">タスクを引く</button>
+          <button id="drawActionBtn" class="btn btn-secondary">今すぐできること</button>
+        </div>
         <div class="action-buttons">
           <button id="execBtn" class="btn btn-success">実行完了</button>
           <button id="skipBtn" class="btn btn-warning">スキップ</button>
@@ -506,17 +596,18 @@
     <div class="lists-container">
       <section class="list-section">
         <div class="list-header">
-          <h2>タスク一覧</h2>
+          <h2>タスク名</h2>
           <button class="add-task-btn" id="addTaskBtn">+ 追加</button>
         </div>
         <ul id="taskList" class="scroll-list"></ul>
       </section>
-
+      
       <section class="list-section">
         <div class="list-header">
-          <h2>ゴミ箱</h2>
+          <h2>今すぐできること</h2>
+          <button class="add-task-btn" id="addActionBtn">+ 追加</button>
         </div>
-        <ul id="trashList" class="scroll-list"></ul>
+        <ul id="actionList" class="scroll-list"></ul>
       </section>
     </div>
   </div>
@@ -526,7 +617,7 @@
     <div class="modal-content">
       <h3 id="modalTitle">タスクを追加</h3>
       <div class="form-group">
-        <label for="taskInput">タスク名</label>
+        <label for="taskInput">内容</label>
         <input type="text" id="taskInput" placeholder="例: 数学の宿題をする">
       </div>
       <div class="modal-buttons">
@@ -556,7 +647,50 @@
     </div>
   </div>
 
+  <!-- テスト管理モーダル -->
+  <div id="testModal" class="modal">
+    <div class="modal-content">
+      <h3>テスト管理</h3>
+      
+      <div class="form-group">
+        <label for="testDateInput">定期テスト日</label>
+        <input type="date" id="testDateInput">
+      </div>
+      <button class="btn btn-success" id="saveTestDateBtn" style="width: 100%; margin-bottom: 20px;">保存</button>
+
+      <div class="section-divider"></div>
+
+      <h3>提出物</h3>
+      <div class="form-group">
+        <label for="submissionInput">提出物名</label>
+        <input type="text" id="submissionInput" placeholder="例: 数学ワークP20-30">
+      </div>
+      <button class="btn btn-success" id="addSubmissionBtn" style="width: 100%; margin-bottom: 15px;">追加</button>
+      <ul id="submissionList" class="habit-list"></ul>
+
+      <div class="section-divider"></div>
+
+      <h3>小テスト（単元テスト）</h3>
+      <div class="form-group">
+        <label for="quizNameInput">テスト名</label>
+        <input type="text" id="quizNameInput" placeholder="例: 英単語テスト">
+      </div>
+      <div class="form-group">
+        <label for="quizDateInput">実施日</label>
+        <input type="date" id="quizDateInput">
+      </div>
+      <button class="btn btn-success" id="addQuizBtn" style="width: 100%; margin-bottom: 15px;">追加</button>
+      <div id="quizListContainer"></div>
+
+      <div class="modal-buttons" style="margin-top: 20px;">
+        <button class="btn btn-primary" id="closeTestBtn">閉じる</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    console.log("スクリプト開始");
+
     // 習慣データ定義
     const HABITS = [
       "バス往路(Leap)",
@@ -567,66 +701,88 @@
       "Vintageの範囲理解"
     ];
 
-    // 曜日別習慣マッピング (0=日曜, 1=月曜, ..., 6=土曜)
     const DAY_HABITS = {
-      0: [3],           // 日曜日
-      1: [2, 3],        // 月曜日
-      2: [2, 4],        // 火曜日
-      3: [0, 1, 3],     // 水曜日
-      4: [2, 3],        // 木曜日
-      5: [2, 4],        // 金曜日
-      6: [4, 5]         // 土曜日
+      0: [3],
+      1: [2, 3],
+      2: [2, 4],
+      3: [0, 1, 3],
+      4: [2, 3],
+      5: [2, 4],
+      6: [4, 5]
     };
 
     const DAY_NAMES = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
 
     // データ構造
     let tasks = [];
-    let trash = [];
-    let currentTask = null;
-    let completedCount = 0;
-    let editingTaskIndex = null;
+    let actions = [];
+    let currentItem = null;
+    let currentType = null;
+    let editingIndex = null;
+    let editingType = null;
     let habitCompletions = {};
+    let testDate = null;
+    let submissions = [];
+    let quizzes = [];
 
     // DOM要素
     const currentTaskDiv = document.getElementById("currentTask");
     const taskList = document.getElementById("taskList");
-    const trashList = document.getElementById("trashList");
-    const remainingCountEl = document.getElementById("remainingCount");
-    const completedCountEl = document.getElementById("completedCount");
+    const actionList = document.getElementById("actionList");
+    const taskCountEl = document.getElementById("taskCount");
+    const actionCountEl = document.getElementById("actionCount");
+    const testCountdownEl = document.getElementById("testCountdown");
     const taskModal = document.getElementById("taskModal");
     const habitModal = document.getElementById("habitModal");
+    const testModal = document.getElementById("testModal");
     const modalTitle = document.getElementById("modalTitle");
     const taskInput = document.getElementById("taskInput");
-    const habitList = document.getElementById("habitList");
-    const habitDayName = document.getElementById("habitDayName");
-    const todayDate = document.getElementById("todayDate");
-    const habitProgressText = document.getElementById("habitProgressText");
-    const habitProgressFill = document.getElementById("habitProgressFill");
 
     // イベントリスナー
-    document.getElementById("drawBtn").addEventListener("click", drawTask);
-    document.getElementById("execBtn").addEventListener("click", executeTask);
-    document.getElementById("skipBtn").addEventListener("click", skipTask);
-    document.getElementById("addTaskBtn").addEventListener("click", openAddModal);
-    document.getElementById("saveTaskBtn").addEventListener("click", saveTask);
+    document.getElementById("drawTaskBtn").addEventListener("click", function() {
+      drawItem('task');
+    });
+    
+    document.getElementById("drawActionBtn").addEventListener("click", function() {
+      drawItem('action');
+    });
+    
+    document.getElementById("execBtn").addEventListener("click", executeItem);
+    document.getElementById("skipBtn").addEventListener("click", skipItem);
+    
+    document.getElementById("addTaskBtn").addEventListener("click", function() {
+      openAddModal('task');
+    });
+    
+    document.getElementById("addActionBtn").addEventListener("click", function() {
+      openAddModal('action');
+    });
+    
+    document.getElementById("saveTaskBtn").addEventListener("click", saveItem);
     document.getElementById("cancelTaskBtn").addEventListener("click", closeTaskModal);
     document.getElementById("habitBtn").addEventListener("click", openHabitModal);
     document.getElementById("closeHabitBtn").addEventListener("click", closeHabitModal);
+    document.getElementById("testBtn").addEventListener("click", openTestModal);
+    document.getElementById("closeTestBtn").addEventListener("click", closeTestModal);
+    document.getElementById("saveTestDateBtn").addEventListener("click", saveTestDate);
+    document.getElementById("addSubmissionBtn").addEventListener("click", addSubmission);
+    document.getElementById("addQuizBtn").addEventListener("click", addQuiz);
 
     // 初期化
     function init() {
+      console.log("初期化開始");
       loadData();
       renderLists();
       updateStats();
+      updateTestCountdown();
       checkNewDay();
+      console.log("初期化完了");
     }
 
-    // 日付が変わったかチェック
     function checkNewDay() {
       const today = new Date().toDateString();
       const lastDate = localStorage.getItem("lastHabitDate");
-
+      
       if (lastDate !== today) {
         habitCompletions = {};
         localStorage.setItem("lastHabitDate", today);
@@ -634,351 +790,295 @@
       }
     }
 
-    // データ保存
     function saveData() {
       const data = {
         tasks: tasks,
-        trash: trash,
-        completedCount: completedCount,
-        habitCompletions: habitCompletions
+        actions: actions,
+        habitCompletions: habitCompletions,
+        testDate: testDate,
+        submissions: submissions,
+        quizzes: quizzes
       };
-      try {
-        localStorage.setItem("taskManagerData", JSON.stringify(data));
-      } catch (e) {
-        console.log("保存に失敗しました");
-      }
+      localStorage.setItem("taskManagerData", JSON.stringify(data));
+      console.log("データ保存完了", data);
     }
 
-    // データ読み込み
     function loadData() {
-      try {
-        const saved = localStorage.getItem("taskManagerData");
-        if (saved) {
-          const data = JSON.parse(saved);
-          tasks = data.tasks || [];
-          trash = data.trash || [];
-          completedCount = data.completedCount || 0;
-          habitCompletions = data.habitCompletions || {};
-        } else {
-          // 初期データ
-          tasks = [
-            {text: "国語：古文単語", pending: 0},
-            {text: "国語：体系漢文", pending: 0},
-            {text: "数学：教科書確認", pending: 0},
-            {text: "英語：Vintageノート", pending: 0},
-            {text: "英語：Leap", pending: 0},
-            {text: "化学：セミナー確認", pending: 0},
-            {text: "地理：NewCompus", pending: 0},
-            {text: "歴史：歴史ノート確認", pending: 0},
-            {text: "部屋の掃除：机をきれいにする", pending: 0},
-            {text: "部屋の掃除：二階をきれいにする", pending: 0}
-          ];
-        }
-      } catch (e) {
-        console.log("読み込みに失敗しました");
-        tasks = [];
-      }
-    }
-
-    // 統計更新
-    function updateStats() {
-      remainingCountEl.textContent = tasks.length;
-      completedCountEl.textContent = completedCount;
-    }
-
-    // リスト表示更新
-    function renderLists() {
-      // タスク一覧
-      taskList.innerHTML = "";
-      tasks.forEach((t, index) => {
-        const li = document.createElement("li");
-
-        const info = document.createElement("div");
-        info.className = "task-info";
-        info.textContent = `${t.text}（スキップ:${t.pending}）`;
-
-        const buttons = document.createElement("div");
-        buttons.className = "task-buttons";
-
-        const editBtn = document.createElement("button");
-        editBtn.textContent = "編集";
-        editBtn.addEventListener("click", () => openEditModal(index));
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.className = "delete-btn";
-        deleteBtn.textContent = "削除";
-        deleteBtn.addEventListener("click", () => deleteTask(index));
-
-        buttons.appendChild(editBtn);
-        buttons.appendChild(deleteBtn);
-
-        li.appendChild(info);
-        li.appendChild(buttons);
-        taskList.appendChild(li);
-      });
-
-      // ゴミ箱
-      trashList.innerHTML = "";
-      trash.forEach((t, index) => {
-        const li = document.createElement("li");
-
-        const info = document.createElement("div");
-        info.className = "task-info";
-        info.textContent = t.text;
-
-        const buttons = document.createElement("div");
-        buttons.className = "task-buttons";
-
-        const restoreBtn = document.createElement("button");
-        restoreBtn.textContent = "復活";
-        restoreBtn.addEventListener("click", () => restoreTask(index));
-
-        const permanentDeleteBtn = document.createElement("button");
-        permanentDeleteBtn.className = "delete-btn";
-        permanentDeleteBtn.textContent = "完全削除";
-        permanentDeleteBtn.addEventListener("click", () => permanentDeleteTask(index));
-
-        buttons.appendChild(restoreBtn);
-        buttons.appendChild(permanentDeleteBtn);
-
-        li.appendChild(info);
-        li.appendChild(buttons);
-        trashList.appendChild(li);
-      });
-
-      updateStats();
-    }
-
-    // 習慣モーダルを開く
-    function openHabitModal() {
-      const today = new Date();
-      const dayOfWeek = today.getDay();
-      const todayHabits = DAY_HABITS[dayOfWeek] || [];
-
-      // 日付表示
-      const month = today.getMonth() + 1;
-      const date = today.getDate();
-      todayDate.textContent = `${month}/${date}`;
-      habitDayName.textContent = `${DAY_NAMES[dayOfWeek]}の習慣`;
-
-      // 習慣リスト表示
-      habitList.innerHTML = "";
-
-      if (todayHabits.length === 0) {
-        const li = document.createElement("li");
-        li.className = "habit-item";
-        li.style.justifyContent = "center";
-        li.style.color = "var(--text-dim)";
-        li.textContent = "今日の習慣はありません";
-        habitList.appendChild(li);
-
-        habitProgressText.textContent = "0 / 0 完了";
-        habitProgressFill.style.width = "0%";
+      const saved = localStorage.getItem("taskManagerData");
+      if (saved) {
+        const data = JSON.parse(saved);
+        tasks = data.tasks || [];
+        actions = data.actions || [];
+        habitCompletions = data.habitCompletions || {};
+        testDate = data.testDate || null;
+        submissions = data.submissions || [];
+        quizzes = data.quizzes || [];
       } else {
-        let completedHabits = 0;
-
-        todayHabits.forEach(habitIndex => {
-          const habitText = HABITS[habitIndex];
-          const isCompleted = habitCompletions[habitIndex] || false;
-
-          if (isCompleted) completedHabits++;
-
-          const li = document.createElement("li");
-          li.className = "habit-item";
-          if (isCompleted) li.classList.add("completed");
-
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.className = "habit-checkbox";
-          checkbox.checked = isCompleted;
-          checkbox.addEventListener("change", () => toggleHabit(habitIndex));
-
-          const text = document.createElement("span");
-          text.className = "habit-text";
-          text.textContent = habitText;
-
-          li.appendChild(checkbox);
-          li.appendChild(text);
-          habitList.appendChild(li);
-        });
-
-        // 進捗表示
-        const progress = Math.round((completedHabits / todayHabits.length) * 100);
-        habitProgressText.textContent = `${completedHabits} / ${todayHabits.length} 完了`;
-        habitProgressFill.style.width = `${progress}%`;
+        tasks = [
+          { text: "国語", pending: 0 },
+          { text: "数学", pending: 0 },
+          { text: "英語", pending: 0 },
+          { text: "化学", pending: 0 },
+          { text: "歴史", pending: 0 },
+          { text: "地理", pending: 0 },
+          { text: "掃除", pending: 0 }
+        ];
+        actions = [
+          { text: "古文単語", pending: 0 },
+          { text: "体系漢文", pending: 0 },
+          { text: "数学教科書確認", pending: 0 },
+          { text: "Vintageノート", pending: 0 },
+          { text: "Leap", pending: 0 },
+          { text: "化学セミナー確認", pending: 0 },
+          { text: "NewCompus", pending: 0 },
+          { text: "歴史ノート", pending: 0 },
+          { text: "机をきれいにする", pending: 0 }
+        ];
       }
-
-      habitModal.classList.add("active");
+      console.log("データ読み込み完了", { tasks, actions });
     }
 
-    // 習慣の完了状態を切り替え
-    function toggleHabit(habitIndex) {
-      habitCompletions[habitIndex] = !habitCompletions[habitIndex];
-      saveData();
-
-      // リアルタイム更新
-      const today = new Date();
-      const dayOfWeek = today.getDay();
-      const todayHabits = DAY_HABITS[dayOfWeek] || [];
-
-      let completedHabits = 0;
-      todayHabits.forEach(index => {
-        if (habitCompletions[index]) completedHabits++;
-      });
-
-      const progress = Math.round((completedHabits / todayHabits.length) * 100);
-      habitProgressText.textContent = `${completedHabits} / ${todayHabits.length} 完了`;
-      habitProgressFill.style.width = `${progress}%`;
-
-      // チェックボックスの親要素を更新
-      const items = document.querySelectorAll(".habit-item");
-      const habitListArray = todayHabits;
-      const itemIndex = habitListArray.indexOf(habitIndex);
-
-      if (itemIndex !== -1 && items[itemIndex]) {
-        if (habitCompletions[habitIndex]) {
-          items[itemIndex].classList.add("completed");
-        } else {
-          items[itemIndex].classList.remove("completed");
-        }
-      }
+    function updateStats() {
+      taskCountEl.textContent = tasks.length;
+      actionCountEl.textContent = actions.length;
     }
 
-    // 習慣モーダルを閉じる
-    function closeHabitModal() {
-      habitModal.classList.remove("active");
-    }
-
-    // タスクを引く（重み付けランダム）
-    function drawTask() {
-      if (tasks.length === 0) {
-        currentTaskDiv.textContent = "タスクがありません";
+    function updateTestCountdown() {
+      if (!testDate) {
+        testCountdownEl.textContent = "--";
         return;
       }
 
-      // スキップ回数が多いほど選ばれやすくする
-      const weights = tasks.map(t => Math.pow(2, t.pending));
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const test = new Date(testDate);
+      test.setHours(0, 0, 0, 0);
+      
+      const diffTime = test - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0) {
+        testCountdownEl.textContent = "終了";
+      } else if (diffDays === 0) {
+        testCountdownEl.textContent = "今日";
+      } else {
+        testCountdownEl.textContent = `${diffDays}日`;
+      }
+    }
+
+    function renderLists() {
+      console.log("リスト描画開始");
+      
+      // タスク一覧
+      taskList.innerHTML = "";
+      for (let i = 0; i < tasks.length; i++) {
+        const t = tasks[i];
+        const li = document.createElement("li");
+        
+        const info = document.createElement("div");
+        info.className = "task-info";
+        info.textContent = t.text;
+        
+        const buttons = document.createElement("div");
+        buttons.className = "task-buttons";
+        
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "編集";
+        editBtn.setAttribute("data-type", "task");
+        editBtn.setAttribute("data-index", i);
+        editBtn.addEventListener("click", handleEdit);
+        
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-btn";
+        deleteBtn.textContent = "削除";
+        deleteBtn.setAttribute("data-type", "task");
+        deleteBtn.setAttribute("data-index", i);
+        deleteBtn.addEventListener("click", handleDelete);
+        
+        buttons.appendChild(editBtn);
+        buttons.appendChild(deleteBtn);
+        
+        li.appendChild(info);
+        li.appendChild(buttons);
+        taskList.appendChild(li);
+      }
+
+      // 今すぐできること一覧
+      actionList.innerHTML = "";
+      for (let i = 0; i < actions.length; i++) {
+        const a = actions[i];
+        const li = document.createElement("li");
+        
+        const info = document.createElement("div");
+        info.className = "task-info";
+        info.textContent = a.text;
+        
+        const buttons = document.createElement("div");
+        buttons.className = "task-buttons";
+        
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "編集";
+        editBtn.setAttribute("data-type", "action");
+        editBtn.setAttribute("data-index", i);
+        editBtn.addEventListener("click", handleEdit);
+        
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-btn";
+        deleteBtn.textContent = "削除";
+        deleteBtn.setAttribute("data-type", "action");
+        deleteBtn.setAttribute("data-index", i);
+        deleteBtn.addEventListener("click", handleDelete);
+        
+        buttons.appendChild(editBtn);
+        buttons.appendChild(deleteBtn);
+        
+        li.appendChild(info);
+        li.appendChild(buttons);
+        actionList.appendChild(li);
+      }
+
+      updateStats();
+      console.log("リスト描画完了");
+    }
+
+    function handleEdit(e) {
+      const type = e.target.getAttribute("data-type");
+      const index = parseInt(e.target.getAttribute("data-index"));
+      console.log("編集クリック", type, index);
+      openEditModal(type, index);
+    }
+
+    function handleDelete(e) {
+      const type = e.target.getAttribute("data-type");
+      const index = parseInt(e.target.getAttribute("data-index"));
+      console.log("削除クリック", type, index);
+      deleteItem(type, index);
+    }
+
+    function deleteItem(type, index) {
+      console.log("削除実行", type, index);
+      
+      if (!confirm("このアイテムを削除しますか？")) {
+        console.log("削除キャンセル");
+        return;
+      }
+      
+      if (type === 'task') {
+        console.log("削除前のtasks", tasks.length);
+        tasks.splice(index, 1);
+        console.log("削除後のtasks", tasks.length);
+      } else {
+        console.log("削除前のactions", actions.length);
+        actions.splice(index, 1);
+        console.log("削除後のactions", actions.length);
+      }
+      
+      if (currentItem) {
+        currentItem = null;
+        currentType = null;
+        currentTaskDiv.textContent = "削除されました";
+      }
+      
+      saveData();
+      renderLists();
+      console.log("削除処理完了");
+    }
+
+    function drawItem(type) {
+      const list = type === 'task' ? tasks : actions;
+      
+      if (list.length === 0) {
+        currentTaskDiv.textContent = type === 'task' ? "タスクがありません" : "行動がありません";
+        return;
+      }
+
+      const weights = list.map(t => Math.pow(2, t.pending));
       const totalWeight = weights.reduce((a, b) => a + b, 0);
       let random = Math.random() * totalWeight;
-
-      for (let i = 0; i < tasks.length; i++) {
+      
+      for (let i = 0; i < list.length; i++) {
         random -= weights[i];
         if (random <= 0) {
-          currentTask = tasks[i];
+          currentItem = list[i];
+          currentType = type;
           break;
         }
       }
 
-      currentTaskDiv.textContent = currentTask.text;
+      currentTaskDiv.textContent = currentItem.text;
     }
 
-    // タスク実行完了
-    function executeTask() {
-      if (!currentTask) return;
-
-      tasks = tasks.filter(t => t !== currentTask);
-      completedCount++;
-      currentTask = null;
-      currentTaskDiv.textContent = "完了しました！次のタスクを引いてください";
-
-      saveData();
-      renderLists();
-    }
-
-    // タスクスキップ
-    function skipTask() {
-      if (!currentTask) return;
-
-      currentTask.pending += 1;
-
-      if (currentTask.pending >= 3) {
-        trash.push(currentTask);
-        tasks = tasks.filter(t => t !== currentTask);
-        currentTaskDiv.textContent = "スキップ上限により削除（ゴミ箱へ）";
+    function executeItem() {
+      if (!currentItem || !currentType) return;
+      
+      if (currentType === 'task') {
+        tasks = tasks.filter(t => t !== currentItem);
       } else {
-        currentTaskDiv.textContent = `保留中（スキップ: ${currentTask.pending}/3）`;
+        actions = actions.filter(a => a !== currentItem);
       }
-
-      currentTask = null;
+      
+      currentItem = null;
+      currentType = null;
+      currentTaskDiv.textContent = "完了しました！次を引いてください";
+      
       saveData();
       renderLists();
     }
 
-    // タスク復活
-    function restoreTask(index) {
-      const task = trash.splice(index, 1)[0];
-      task.pending = 0;
-      tasks.push(task);
-
-      saveData();
-      renderLists();
+    function skipItem() {
+      if (!currentItem || !currentType) return;
+      
+      currentTaskDiv.textContent = "スキップしました。次を引いてください";
+      
+      currentItem = null;
+      currentType = null;
     }
 
-    // タスク削除（ゴミ箱へ）
-    function deleteTask(index) {
-      if (confirm("このタスクをゴミ箱に移動しますか？")) {
-        const task = tasks.splice(index, 1)[0];
-        trash.push(task);
-
-        if (currentTask === task) {
-          currentTask = null;
-          currentTaskDiv.textContent = "削除されました";
-        }
-
-        saveData();
-        renderLists();
-      }
-    }
-
-    // 完全削除
-    function permanentDeleteTask(index) {
-      if (confirm("このタスクを完全に削除しますか？")) {
-        trash.splice(index, 1);
-        saveData();
-        renderLists();
-      }
-    }
-
-    // モーダル開く（追加）
-    function openAddModal() {
-      editingTaskIndex = null;
-      modalTitle.textContent = "タスクを追加";
+    function openAddModal(type) {
+      editingIndex = null;
+      editingType = type;
+      modalTitle.textContent = type === 'task' ? "タスク名を追加" : "今すぐできることを追加";
       taskInput.value = "";
       taskModal.classList.add("active");
       taskInput.focus();
     }
 
-    // モーダル開く（編集）
-    function openEditModal(index) {
-      editingTaskIndex = index;
-      modalTitle.textContent = "タスクを編集";
-      taskInput.value = tasks[index].text;
+    function openEditModal(type, index) {
+      editingIndex = index;
+      editingType = type;
+      modalTitle.textContent = type === 'task' ? "タスク名を編集" : "今すぐできることを編集";
+      taskInput.value = type === 'task' ? tasks[index].text : actions[index].text;
       taskModal.classList.add("active");
       taskInput.focus();
     }
 
-    // モーダル閉じる
     function closeTaskModal() {
       taskModal.classList.remove("active");
       taskInput.value = "";
-      editingTaskIndex = null;
+      editingIndex = null;
+      editingType = null;
     }
 
-    // タスク保存
-    function saveTask() {
+    function saveItem() {
       const text = taskInput.value.trim();
-
+      
       if (!text) {
-        alert("タスク名を入力してください");
+        alert("内容を入力してください");
         return;
       }
 
-      if (editingTaskIndex !== null) {
-        // 編集
-        tasks[editingTaskIndex].text = text;
+      if (editingIndex !== null) {
+        if (editingType === 'task') {
+          tasks[editingIndex].text = text;
+        } else {
+          actions[editingIndex].text = text;
+        }
       } else {
-        // 新規追加
-        tasks.push({text: text, pending: 0});
+        if (editingType === 'task') {
+          tasks.push({ text: text, pending: 0 });
+        } else {
+          actions.push({ text: text, pending: 0 });
+        }
       }
 
       saveData();
@@ -986,29 +1086,277 @@
       closeTaskModal();
     }
 
-    // Enterキーで保存
-    taskInput.addEventListener("keypress", (e) => {
+    function openHabitModal() {
+      const today = new Date();
+      const dayOfWeek = today.getDay();
+      const todayHabits = DAY_HABITS[dayOfWeek] || [];
+      
+      const month = today.getMonth() + 1;
+      const date = today.getDate();
+      document.getElementById("todayDate").textContent = `${month}/${date}`;
+      document.getElementById("habitDayName").textContent = `${DAY_NAMES[dayOfWeek]}の習慣`;
+      
+      const habitList = document.getElementById("habitList");
+      habitList.innerHTML = "";
+      
+      if (todayHabits.length === 0) {
+        const li = document.createElement("li");
+        li.className = "habit-item";
+        li.style.justifyContent = "center";
+        li.style.color = "var(--text-dim)";
+        li.textContent = "今日の習慣はありません";
+        habitList.appendChild(li);
+        
+        document.getElementById("habitProgressText").textContent = "0 / 0 完了";
+        document.getElementById("habitProgressFill").style.width = "0%";
+      } else {
+        let completedHabits = 0;
+        
+        todayHabits.forEach(habitIndex => {
+          const habitText = HABITS[habitIndex];
+          const isCompleted = habitCompletions[habitIndex] || false;
+          
+          if (isCompleted) completedHabits++;
+          
+          const li = document.createElement("li");
+          li.className = "habit-item";
+          if (isCompleted) li.classList.add("completed");
+          
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "habit-checkbox";
+          checkbox.checked = isCompleted;
+          checkbox.setAttribute("data-habit-index", habitIndex);
+          checkbox.addEventListener("change", toggleHabit);
+          
+          const text = document.createElement("span");
+          text.className = "habit-text";
+          text.textContent = habitText;
+          
+          li.appendChild(checkbox);
+          li.appendChild(text);
+          habitList.appendChild(li);
+        });
+        
+        const progress = Math.round((completedHabits / todayHabits.length) * 100);
+        document.getElementById("habitProgressText").textContent = `${completedHabits} / ${todayHabits.length} 完了`;
+        document.getElementById("habitProgressFill").style.width = `${progress}%`;
+      }
+      
+      habitModal.classList.add("active");
+    }
+
+    function toggleHabit(e) {
+      const habitIndex = parseInt(e.target.getAttribute("data-habit-index"));
+      habitCompletions[habitIndex] = !habitCompletions[habitIndex];
+      saveData();
+      
+      const today = new Date();
+      const dayOfWeek = today.getDay();
+      const todayHabits = DAY_HABITS[dayOfWeek] || [];
+      
+      let completedHabits = 0;
+      todayHabits.forEach(index => {
+        if (habitCompletions[index]) completedHabits++;
+      });
+      
+      const progress = Math.round((completedHabits / todayHabits.length) * 100);
+      document.getElementById("habitProgressText").textContent = `${completedHabits} / ${todayHabits.length} 完了`;
+      document.getElementById("habitProgressFill").style.width = `${progress}%`;
+      
+      if (e.target.checked) {
+        e.target.parentElement.classList.add("completed");
+      } else {
+        e.target.parentElement.classList.remove("completed");
+      }
+    }
+
+    function closeHabitModal() {
+      habitModal.classList.remove("active");
+    }
+
+    function openTestModal() {
+      if (testDate) {
+        document.getElementById("testDateInput").value = testDate;
+      }
+      renderSubmissions();
+      renderQuizzes();
+      testModal.classList.add("active");
+    }
+
+    function closeTestModal() {
+      testModal.classList.remove("active");
+    }
+
+    function saveTestDate() {
+      testDate = document.getElementById("testDateInput").value;
+      saveData();
+      updateTestCountdown();
+      alert("定期テスト日を保存しました");
+    }
+
+    function addSubmission() {
+      const text = document.getElementById("submissionInput").value.trim();
+      
+      if (!text) {
+        alert("提出物名を入力してください");
+        return;
+      }
+
+      submissions.push({ text: text, completed: false });
+      document.getElementById("submissionInput").value = "";
+      saveData();
+      renderSubmissions();
+    }
+
+    function renderSubmissions() {
+      const submissionList = document.getElementById("submissionList");
+      submissionList.innerHTML = "";
+      
+      if (submissions.length === 0) {
+        const li = document.createElement("li");
+        li.className = "habit-item";
+        li.style.justifyContent = "center";
+        li.style.color = "var(--text-dim)";
+        li.textContent = "提出物はありません";
+        submissionList.appendChild(li);
+        return;
+      }
+
+      for (let i = 0; i < submissions.length; i++) {
+        const sub = submissions[i];
+        const li = document.createElement("li");
+        li.className = "habit-item";
+        if (sub.completed) li.classList.add("completed");
+        
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "habit-checkbox";
+        checkbox.checked = sub.completed;
+        checkbox.addEventListener("change", function() {
+          submissions[i].completed = !submissions[i].completed;
+          saveData();
+          renderSubmissions();
+        });
+        
+        const text = document.createElement("span");
+        text.className = "habit-text";
+        text.textContent = sub.text;
+        
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "削除";
+        deleteBtn.style.background = "var(--danger)";
+        deleteBtn.style.marginLeft = "auto";
+        deleteBtn.addEventListener("click", function() {
+          submissions.splice(i, 1);
+          saveData();
+          renderSubmissions();
+        });
+        
+        li.appendChild(checkbox);
+        li.appendChild(text);
+        li.appendChild(deleteBtn);
+        submissionList.appendChild(li);
+      }
+    }
+
+    function addQuiz() {
+      const name = document.getElementById("quizNameInput").value.trim();
+      const date = document.getElementById("quizDateInput").value;
+      
+      if (!name || !date) {
+        alert("テスト名と実施日を入力してください");
+        return;
+      }
+
+      quizzes.push({ name: name, date: date });
+      quizzes.sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      document.getElementById("quizNameInput").value = "";
+      document.getElementById("quizDateInput").value = "";
+      saveData();
+      renderQuizzes();
+    }
+
+    function renderQuizzes() {
+      const quizListContainer = document.getElementById("quizListContainer");
+      quizListContainer.innerHTML = "";
+      
+      if (quizzes.length === 0) {
+        const div = document.createElement("div");
+        div.className = "test-item";
+        div.style.justifyContent = "center";
+        div.style.color = "var(--text-dim)";
+        div.textContent = "小テストはありません";
+        quizListContainer.appendChild(div);
+        return;
+      }
+
+      for (let i = 0; i < quizzes.length; i++) {
+        const quiz = quizzes[i];
+        const div = document.createElement("div");
+        div.className = "test-item";
+        
+        const info = document.createElement("div");
+        info.className = "test-item-info";
+        
+        const title = document.createElement("div");
+        title.className = "test-item-title";
+        title.textContent = quiz.name;
+        
+        const dateText = document.createElement("div");
+        dateText.className = "test-item-date";
+        const quizDate = new Date(quiz.date);
+        dateText.textContent = `${quizDate.getMonth() + 1}/${quizDate.getDate()}`;
+        
+        info.appendChild(title);
+        info.appendChild(dateText);
+        
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "削除";
+        deleteBtn.addEventListener("click", function() {
+          quizzes.splice(i, 1);
+          saveData();
+          renderQuizzes();
+        });
+        
+        div.appendChild(info);
+        div.appendChild(deleteBtn);
+        quizListContainer.appendChild(div);
+      }
+    }
+
+    taskInput.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
-        saveTask();
+        saveItem();
       }
     });
 
-    // モーダル外クリックで閉じる
-    taskModal.addEventListener("click", (e) => {
+    document.getElementById("submissionInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        addSubmission();
+      }
+    });
+
+    taskModal.addEventListener("click", function(e) {
       if (e.target === taskModal) {
         closeTaskModal();
       }
     });
 
-    habitModal.addEventListener("click", (e) => {
+    habitModal.addEventListener("click", function(e) {
       if (e.target === habitModal) {
         closeHabitModal();
       }
     });
 
-    // 初期化実行
+    testModal.addEventListener("click", function(e) {
+      if (e.target === testModal) {
+        closeTestModal();
+      }
+    });
+
     init();
   </script>
 </body>
-
 </html>
