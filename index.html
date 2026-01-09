@@ -196,6 +196,14 @@
       background: var(--bg-color);
       border-radius: 8px;
       text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+
+    .test-info-box:hover {
+      border-color: var(--info);
+      transform: scale(1.05);
     }
 
     .test-info-number {
@@ -696,16 +704,16 @@
             <div class="test-countdown-label">定期テストまで</div>
           </div>
           <div class="test-quick-info">
-            <div class="test-info-box">
+            <div class="test-info-box" id="submissionBox">
               <div class="test-info-number" id="submissionCountMain">0</div>
               <div class="test-info-label">提出物</div>
             </div>
-            <div class="test-info-box">
+            <div class="test-info-box" id="quizBox">
               <div class="test-info-number" id="quizCountMain">0</div>
               <div class="test-info-label">小テスト</div>
             </div>
           </div>
-          <button class="btn btn-info btn-block" id="openTestBtn">詳細を見る</button>
+          <button class="btn btn-info btn-block" id="openTestBtn">追加</button>
         </div>
       </div>
 
@@ -739,6 +747,7 @@
 
   <!-- 習慣詳細モーダル -->
   <div id="habitModal" class="modal">
+    <button class="modal-close-btn" id="closeHabitBtn">✕ 閉じる</button>
     <div class="modal-content">
       <h3>
         <span id="habitDayName">今日の習慣</span>
@@ -752,15 +761,11 @@
         </div>
       </div>
 
-      <h4 style="color: var(--text-dim); font-size: 1rem;">実行履歴（今月）</h4>
-      <div class="habit-calendar" id="habitCalendar"></div>
-
       <h4 style="color: var(--text-dim); font-size: 1rem;">今日のタスク</h4>
       <ul class="habit-list" id="habitList"></ul>
 
-      <div class="modal-buttons">
-        <button class="btn btn-success" id="closeHabitBtn">閉じる</button>
-      </div>
+      <h4 style="color: var(--text-dim); font-size: 1rem; margin-top: 30px;">実行履歴（今月）</h4>
+      <div class="habit-calendar" id="habitCalendar"></div>
     </div>
   </div>
 
@@ -804,6 +809,7 @@
 
   <!-- ランダムタスク詳細モーダル -->
   <div id="randomModal" class="modal">
+    <button class="modal-close-btn" id="closeRandomBtn">✕ 閉じる</button>
     <div class="modal-content">
       <h3>ランダムタスク</h3>
       
@@ -830,15 +836,12 @@
       <h4 style="color: var(--text-dim);">今すぐできること</h4>
       <button class="btn btn-secondary btn-block" id="addActionBtn">+ 追加</button>
       <ul class="scroll-list" id="actionList"></ul>
-
-      <div class="modal-buttons">
-        <button class="btn btn-primary" id="closeRandomBtn">閉じる</button>
-      </div>
     </div>
   </div>
 
   <!-- タスク追加/編集モーダル -->
   <div id="taskEditModal" class="modal">
+    <button class="modal-close-btn" id="cancelTaskBtn">✕ 閉じる</button>
     <div class="modal-content" style="max-width: 400px;">
       <h3 id="taskEditTitle">タスクを追加</h3>
       <div class="form-group">
@@ -846,7 +849,6 @@
       </div>
       <div class="modal-buttons">
         <button class="btn btn-success" id="saveTaskBtn">保存</button>
-        <button class="btn btn-danger" id="cancelTaskBtn">キャンセル</button>
       </div>
     </div>
   </div>
@@ -892,6 +894,8 @@
     // DOM要素
     const habitModal = document.getElementById("habitModal");
     const testModal = document.getElementById("testModal");
+    const submissionModal = document.getElementById("submissionModal");
+    const quizModal = document.getElementById("quizModal");
     const randomModal = document.getElementById("randomModal");
     const taskEditModal = document.getElementById("taskEditModal");
 
@@ -900,39 +904,132 @@
     document.getElementById("openTestBtn").addEventListener("click", openTestModal);
     document.getElementById("openRandomBtn").addEventListener("click", openRandomModal);
     
-    document.getElementById("drawTaskBtnMain").addEventListener("click", function() {
-      drawItemQuick('task');
-    });
+    const drawTaskBtnMain = document.getElementById("drawTaskBtnMain");
+    if (drawTaskBtnMain) {
+      drawTaskBtnMain.addEventListener("click", function() {
+        drawItemQuick('task');
+      });
+    }
     
-    document.getElementById("drawActionBtnMain").addEventListener("click", function() {
-      drawItemQuick('action');
-    });
+    const drawActionBtnMain = document.getElementById("drawActionBtnMain");
+    if (drawActionBtnMain) {
+      drawActionBtnMain.addEventListener("click", function() {
+        drawItemQuick('action');
+      });
+    }
     
-    document.getElementById("drawTaskBtn").addEventListener("click", function() {
-      drawItem('task');
-    });
+    const drawTaskBtn = document.getElementById("drawTaskBtn");
+    if (drawTaskBtn) {
+      drawTaskBtn.addEventListener("click", function() {
+        drawItem('task');
+      });
+    }
     
-    document.getElementById("drawActionBtn").addEventListener("click", function() {
-      drawItem('action');
-    });
+    const drawActionBtn = document.getElementById("drawActionBtn");
+    if (drawActionBtn) {
+      drawActionBtn.addEventListener("click", function() {
+        drawItem('action');
+      });
+    }
     
-    document.getElementById("execBtn").addEventListener("click", executeItem);
-    document.getElementById("skipBtn").addEventListener("click", skipItem);
-    document.getElementById("addTaskBtn").addEventListener("click", function() {
-      openAddModal('task');
-    });
-    document.getElementById("addActionBtn").addEventListener("click", function() {
-      openAddModal('action');
-    });
+    const execBtn = document.getElementById("execBtn");
+    if (execBtn) {
+      execBtn.addEventListener("click", executeItem);
+    }
     
-    document.getElementById("saveTaskBtn").addEventListener("click", saveItem);
-    document.getElementById("cancelTaskBtn").addEventListener("click", closeTaskEditModal);
-    document.getElementById("closeHabitBtn").addEventListener("click", closeHabitModal);
-    document.getElementById("closeTestBtn").addEventListener("click", closeTestModal);
-    document.getElementById("closeRandomBtn").addEventListener("click", closeRandomModal);
-    document.getElementById("saveTestDateBtn").addEventListener("click", saveTestDate);
-    document.getElementById("addSubmissionBtn").addEventListener("click", addSubmission);
-    document.getElementById("addQuizBtn").addEventListener("click", addQuiz);
+    const skipBtn = document.getElementById("skipBtn");
+    if (skipBtn) {
+      skipBtn.addEventListener("click", skipItem);
+    }
+    
+    const addTaskBtn = document.getElementById("addTaskBtn");
+    if (addTaskBtn) {
+      addTaskBtn.addEventListener("click", function() {
+        openAddModal('task');
+      });
+    }
+    
+    const addActionBtn = document.getElementById("addActionBtn");
+    if (addActionBtn) {
+      addActionBtn.addEventListener("click", function() {
+        openAddModal('action');
+      });
+    }
+    
+    const saveTaskBtn = document.getElementById("saveTaskBtn");
+    if (saveTaskBtn) {
+      saveTaskBtn.addEventListener("click", saveItem);
+    }
+    
+    const cancelTaskBtn = document.getElementById("cancelTaskBtn");
+    if (cancelTaskBtn) {
+      cancelTaskBtn.addEventListener("click", closeTaskEditModal);
+    }
+    
+    const closeHabitBtn = document.getElementById("closeHabitBtn");
+    if (closeHabitBtn) {
+      closeHabitBtn.addEventListener("click", function(e) {
+        e.stopPropagation();
+        closeHabitModal();
+      });
+    }
+    
+    const closeTestBtn = document.getElementById("closeTestBtn");
+    if (closeTestBtn) {
+      closeTestBtn.addEventListener("click", function(e) {
+        e.stopPropagation();
+        closeTestModal();
+      });
+    }
+    
+    const closeSubmissionBtn = document.getElementById("closeSubmissionBtn");
+    if (closeSubmissionBtn) {
+      closeSubmissionBtn.addEventListener("click", function(e) {
+        e.stopPropagation();
+        closeSubmissionModal();
+      });
+    }
+    
+    const closeQuizBtn = document.getElementById("closeQuizBtn");
+    if (closeQuizBtn) {
+      closeQuizBtn.addEventListener("click", function(e) {
+        e.stopPropagation();
+        closeQuizModal();
+      });
+    }
+    
+    const closeRandomBtn = document.getElementById("closeRandomBtn");
+    if (closeRandomBtn) {
+      closeRandomBtn.addEventListener("click", function(e) {
+        e.stopPropagation();
+        closeRandomModal();
+      });
+    }
+    
+    const saveTestDateBtn = document.getElementById("saveTestDateBtn");
+    if (saveTestDateBtn) {
+      saveTestDateBtn.addEventListener("click", saveTestDate);
+    }
+    
+    const addSubmissionBtn = document.getElementById("addSubmissionBtn");
+    if (addSubmissionBtn) {
+      addSubmissionBtn.addEventListener("click", addSubmission);
+    }
+    
+    const addQuizBtn = document.getElementById("addQuizBtn");
+    if (addQuizBtn) {
+      addQuizBtn.addEventListener("click", addQuiz);
+    }
+    
+    const submissionBox = document.getElementById("submissionBox");
+    if (submissionBox) {
+      submissionBox.addEventListener("click", openSubmissionModal);
+    }
+    
+    const quizBox = document.getElementById("quizBox");
+    if (quizBox) {
+      quizBox.addEventListener("click", openQuizModal);
+    }
 
     // 初期化
     function init() {
@@ -1292,13 +1389,29 @@
       if (testDate) {
         document.getElementById("testDateInput").value = testDate;
       }
-      renderSubmissions();
-      renderQuizzes();
       testModal.classList.add("active");
     }
 
     function closeTestModal() {
       testModal.classList.remove("active");
+    }
+
+    function openSubmissionModal() {
+      renderSubmissionsDetail();
+      submissionModal.classList.add("active");
+    }
+
+    function closeSubmissionModal() {
+      submissionModal.classList.remove("active");
+    }
+
+    function openQuizModal() {
+      renderQuizzesDetail();
+      quizModal.classList.add("active");
+    }
+
+    function closeQuizModal() {
+      quizModal.classList.remove("active");
     }
 
     function saveTestDate() {
@@ -1319,12 +1432,12 @@
       submissions.push({ text: text, completed: false });
       document.getElementById("submissionInput").value = "";
       saveData();
-      renderSubmissions();
       updateMainView();
+      alert("提出物を追加しました");
     }
 
-    function renderSubmissions() {
-      const submissionList = document.getElementById("submissionList");
+    function renderSubmissionsDetail() {
+      const submissionList = document.getElementById("submissionListDetail");
       submissionList.innerHTML = "";
       
       if (submissions.length === 0) {
@@ -1350,7 +1463,8 @@
         checkbox.addEventListener("change", function() {
           submissions[i].completed = !submissions[i].completed;
           saveData();
-          renderSubmissions();
+          renderSubmissionsDetail();
+          updateMainView();
         });
         
         const text = document.createElement("span");
@@ -1370,7 +1484,7 @@
         deleteBtn.addEventListener("click", function() {
           submissions.splice(i, 1);
           saveData();
-          renderSubmissions();
+          renderSubmissionsDetail();
           updateMainView();
         });
         
@@ -1396,12 +1510,12 @@
       document.getElementById("quizNameInput").value = "";
       document.getElementById("quizDateInput").value = "";
       saveData();
-      renderQuizzes();
       updateMainView();
+      alert("小テストを追加しました");
     }
 
-    function renderQuizzes() {
-      const quizListContainer = document.getElementById("quizListContainer");
+    function renderQuizzesDetail() {
+      const quizListContainer = document.getElementById("quizListDetail");
       quizListContainer.innerHTML = "";
       
       if (quizzes.length === 0) {
@@ -1439,7 +1553,7 @@
         deleteBtn.addEventListener("click", function() {
           quizzes.splice(i, 1);
           saveData();
-          renderQuizzes();
+          renderQuizzesDetail();
           updateMainView();
         });
         
@@ -1701,42 +1815,72 @@
     }
 
     // モーダル外クリックで閉じる
-    habitModal.addEventListener("click", function(e) {
-      if (e.target === habitModal) {
-        closeHabitModal();
-      }
-    });
+    if (habitModal) {
+      habitModal.addEventListener("click", function(e) {
+        if (e.target === habitModal) {
+          closeHabitModal();
+        }
+      });
+    }
 
-    testModal.addEventListener("click", function(e) {
-      if (e.target === testModal) {
-        closeTestModal();
-      }
-    });
+    if (testModal) {
+      testModal.addEventListener("click", function(e) {
+        if (e.target === testModal) {
+          closeTestModal();
+        }
+      });
+    }
 
-    randomModal.addEventListener("click", function(e) {
-      if (e.target === randomModal) {
-        closeRandomModal();
-      }
-    });
+    if (submissionModal) {
+      submissionModal.addEventListener("click", function(e) {
+        if (e.target === submissionModal) {
+          closeSubmissionModal();
+        }
+      });
+    }
 
-    taskEditModal.addEventListener("click", function(e) {
-      if (e.target === taskEditModal) {
-        closeTaskEditModal();
-      }
-    });
+    if (quizModal) {
+      quizModal.addEventListener("click", function(e) {
+        if (e.target === quizModal) {
+          closeQuizModal();
+        }
+      });
+    }
+
+    if (randomModal) {
+      randomModal.addEventListener("click", function(e) {
+        if (e.target === randomModal) {
+          closeRandomModal();
+        }
+      });
+    }
+
+    if (taskEditModal) {
+      taskEditModal.addEventListener("click", function(e) {
+        if (e.target === taskEditModal) {
+          closeTaskEditModal();
+        }
+      });
+    }
 
     // Enterキー
-    document.getElementById("taskInput").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") {
-        saveItem();
-      }
-    });
+    const taskInput = document.getElementById("taskInput");
+    if (taskInput) {
+      taskInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+          saveItem();
+        }
+      });
+    }
 
-    document.getElementById("submissionInput").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") {
-        addSubmission();
-      }
-    });
+    const submissionInput = document.getElementById("submissionInput");
+    if (submissionInput) {
+      submissionInput.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+          addSubmission();
+        }
+      });
+    }
 
     init();
   </script>
